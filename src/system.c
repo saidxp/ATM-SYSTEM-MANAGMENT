@@ -173,34 +173,68 @@ void createNewAcc(struct User *u)
     struct Record r;
     struct Record cr;
     FILE *pf = fopen(RECORDS, "a+");
-    char day[1024];
-    char Tnumber[1024];
-    char country[1024];
-    char phone[1024];
-    char Amount[1024];
-    char Type[1024];
+    // ==== >> variables to handle input
+    char day[16];         
+    char Tnumber[16];    
+    char country[64];     
+    char phone[16];       
+    char Amount[32];     
+    char Type[32];        
+    
+    // Check if file was opened successfully
+    if (pf == NULL) {
+        perror("Error opening records file");
+        return;
+    }
 
     system("clear");
 
 noAccount:
+    system("clear");
+    printf("\n\n\t\t\t   ======= ATM =======\n");
     printf("\t\t\t===== New record =====\n");
 
+    // Get date with buffer overflow protection
     printf("\nEnter today's date(mm/dd/yyyy): ");
-    fgets(day, 1024, stdin);
+    if (fgets(day, sizeof(day), stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        goto noAccount;
+    }
+    
+    // Check for overflow using strchr to find newline character
+    if (strchr(day, '\n') == NULL) {
+        // Input was too long, clear the remaining buffer
+        clearInputBuffer();
+        printf("Input too long. Please try again with a shorter date.");
+        goto noAccount;
+    }
+    // Remove newline character
     day[strcspn(day, "\n")] = '\0';
-    /// CHECK THE DATE FORMAT
+    /// CHECK THE DATE FORMAT !!! 
     CheCkday(day, &r);
     printf("The date is: %s\n", day);
-    printf("\nEnter number of Acount: ");
-    // clear buffer from stdin file
-    if (fgets(Tnumber, 1024, stdin) != NULL)
-    {
-        // ----- >  -----<< ----
-        Tnumber[strcspn(Tnumber, "\n")] = '\0';
+    
+    // Get account number with buffer overflow protection
+    printf("\nEnter number of Account: ");
+    if (fgets(Tnumber, sizeof(Tnumber), stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        goto noAccount;
     }
+    
+    // Check for overflow
+    if (strchr(Tnumber, '\n') == NULL) {
+        clearInputBuffer();
+        printf("Input too long, (Eroor at Number of Acount) << ! Please respect the limit of 6 digits or u will return to the starting point !!! >>");
+        goto noAccount;
+    }
+    
+    // Remove newline character
+    Tnumber[strcspn(Tnumber, "\n")] = '\0';
+    
     // CHECK THE NUMBER OF ACCOUNT
     validprompt(Tnumber, "N");
     r.accountNbr = atoi(Tnumber);
+    
     int count = 0;
     fseek(pf, 0, SEEK_SET);
     while (getAccountFromFile(pf, &cr))
@@ -214,7 +248,8 @@ noAccount:
         }
         count++;
     }
-    /// her i will after i check a valid date i need to put it in the struct
+    
+    /// Set ID based on count
     if (count == 0)
     {
         r.id = 0;
@@ -223,40 +258,95 @@ noAccount:
     {
         r.id = cr.id + 1;
     }
-    // printf("--- >>> %d", count);
-    //  r.id = cr.id + 1;
+    
+    // Get country with buffer overflow protection
     printf("\nEnter the country: ");
-    fgets(country, sizeof(country), stdin);
-    // ----- >  -----<< ----
+    if (fgets(country, sizeof(country), stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        goto noAccount;
+    }
+    
+    // Check for overflow
+    if (strchr(country, '\n') == NULL) {
+        clearInputBuffer();
+        printf("Input too long, (Error at Country name) << Please respect the limit of 50 characters or u will return to the starting point >> !!");
+        goto noAccount;
+    }
+    // Remove newline character
     country[strcspn(country, "\n")] = '\0';
+    
     validprompt(country, "C");
     strcpy(r.country, country);
+    
+    // Get phone with buffer overflow protection
     printf("\nEnter the phone number: ");
-    fgets(phone, sizeof(phone), stdin);
-    // ----- >  -----<< ----
+    if (fgets(phone, sizeof(phone), stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        goto noAccount;
+    }
+    
+    // Check for overflow
+    if (strchr(phone, '\n') == NULL) {
+        clearInputBuffer();
+        printf("Input too long, (Error at Phone number) << Please respect the limit of 9 digits or u will return to the starting point >> !!");
+        goto noAccount;
+    }
+    
+    // remove newline character
     phone[strcspn(phone, "\n")] = '\0';
+    
     validprompt(phone, "P");
     r.phone = atoi(phone);
-    // ------------------------------ > ||
-    // problem from read stdin get suck at this instruction !
-    //
+    
+    // get amount to deposit with buffer overflow protection
     printf("\nEnter amount to deposit $: ");
-    // hehehe
-    fgets(Amount, 1024, stdin);
-    // hehhehe
+    if (fgets(Amount, sizeof(Amount), stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        goto noAccount;
+    }
+    
+    // check for overflow
+    if (strchr(Amount, '\n') == NULL) {
+        clearInputBuffer();
+        printf("Input too long ,(Error at Amount phase) << please respect the limit of 9 digits or u will return to the starting point >> !!");
+        goto noAccount;
+    }
+    
+    // remove newline character
     Amount[strcspn(Amount, "\n")] = '\0';
-    // (----- >>> Problem of stdin file !<<<-----)
+    // HER I DETETCT EROOOR !
     validprompt(Amount, "D");
-    // (----- >>>convert <<<----)
     r.amount = strtod(Amount, NULL);
+    
+    // Get account type with buffer overflow protection
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
-    fgets(Type, 1024, stdin);
+    if (fgets(Type, sizeof(Type), stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        goto noAccount;
+    }
+    
+    // Check for overflow
+    if (strchr(Type, '\n') == NULL) {
+        clearInputBuffer();
+        printf("Input too long, (Error at Type of account) << Please respect the limit 7 characters or u will return to the starting point >> !!");
+        goto noAccount;
+    }
+    
+    // Remove newline character
     Type[strcspn(Type, "\n")] = '\0';
+    
     validprompt(Type, "T");
     strcpy(r.accountType, Type);
+    
     saveAccountToFile(pf, u, &r);
     fclose(pf);
     success(u);
+}
+
+// Helper function to safely clear input buffer
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
 void checkAllAccounts(struct User *u)

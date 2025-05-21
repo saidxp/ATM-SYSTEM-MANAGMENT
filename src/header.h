@@ -87,4 +87,5 @@ int isValidFormat(const char *date);
 int Checkifexist(int nbr, char *name);
 bool checkvalidamount(char *str);
 yearandrate calculaterate(double Amount, char *Type, int year);
+void clearInputBuffer();
 #endif
