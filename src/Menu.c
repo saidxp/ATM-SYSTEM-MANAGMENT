@@ -364,7 +364,7 @@ void transaction(struct User *u)
                 fgets(take, sizeof(take), stdin);
                 take[strcspn(take, "\n")] = '\0';
                 validprompt(take, "D");
-                int t = atoi(take);
+                double t = strtod(take, NULL);
                 if (t > r.amount)
                 {
                     system("clear");
@@ -378,7 +378,7 @@ void transaction(struct User *u)
                 else
                 {
                     r.amount = r.amount - t;
-                    printf("U take %d $ from account successfully !\n", t);
+                    printf("U take %lf $ from account successfully !\n", t);
                 }
                 break;
             default:

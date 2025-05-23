@@ -297,22 +297,32 @@ void CheCkday(char *date, struct Record *r)
 void validprompt(char *input, char *option)
 {
     int len;
-    if (strcmp(option, "N") == 0)
+     if (strcmp(option, "N") == 0)
     {
         while (1)
         {
-
             len = strlen(input);
 
             if (len == 0 || len > 6 || !ISNAME(input))
             {
-                printf("Invalid input. Please enter a valid number (up to 6 digits) : ");
+                printf("Invalid input. Please enter a valid number (up to 6 digits): ");
 
                 if (fgets(input, 1024, stdin) != NULL)
                 {
+                    // check for buffer overflow protection
+                    if (strchr(input, '\n') == NULL) {
+                        // input too long, clear the input buffer
+                        int c;
+                        while ((c = getchar()) != '\n' && c != EOF);
+                        printf("\033[0;31m");
+                        printf("<<(Input too long)!>> ");
+                        printf("\033[0m");
+                        continue;
+                    }
+                    
                     input[strcspn(input, "\n")] = '\0';
+                    
                 }
-
                 continue;
             }
             else
@@ -322,6 +332,7 @@ void validprompt(char *input, char *option)
             }
         }
     }
+     
     if (strcmp(option, "C") == 0)
     {
         while (1)
@@ -331,61 +342,90 @@ void validprompt(char *input, char *option)
             struct Country c;
 
             FILE *pf = fopen("../data/country.txt", "r");
-            while (fscanf(pf, "%49s", c.country) != EOF) // her i limit the buffer
+            if (pf == NULL) {
+                printf("Error opening country file.\n");
+                break;
+            }
+            
+            while (fgets(c.country,  50, pf) != NULL) // Limited buffer as you had
             {
+                c.country[strcspn(c.country, "\n")] = '\0';
                 if (strcmp(c.country, input) == 0)
                 {
                     i = 1;
+                    break;
                 }
             }
-
             fclose(pf);
-
             if (len == 0 || !isPrintableString(input) || i == 0)
             {
-                printf("Invalid input. Please enter a valid country name Must be Uppercase First Letter: ");
+                printf("Invalid input. Please enter a valid country name (Must be Uppercase First Letter): ");
                 if (fgets(input, 1024, stdin) != NULL)
                 {
+                    // Check for buffer overflow protection
+                    if (strchr(input, '\n') == NULL) {
+                          //printf("input : %s\n", input);
+                        // Input too long, clear the input buffer
+                        int c;
+                        while ((c = getchar()) != '\n' && c != EOF);
+                        printf("\033[0;31m");
+                        printf("<<(Input too long)!>> ");
+                        printf("\033[0m");
+                        continue;
+                    }
                     input[strcspn(input, "\n")] = '\0';
+                    //printf("input : %s\n", input);
+                    
                 }
                 continue;
             }
             else
             {
-
                 break;
             }
         }
     }
-    if (strcmp(option, "P") == 0)
+    
+      if (strcmp(option, "P") == 0)
     {
         while (1)
         {
             int i = 0;
-            int len;
             len = strlen(input);
             char *Temp = input;
+            
             while (*Temp)
             {
                 if (isalpha(*Temp))
                 {
                     i = 1;
+                    break;
                 }
                 Temp++;
             }
-            if (i == 1 || len == 0 || (len > 9 || len < 9))
+            
+            if (i == 1 || len == 0 || len != 9) // Fixed: should be exactly 9, not range check
             {
-                printf("Invalid input. Please enter a valid number phone (up to 9 characters): ");
-                if (fgets(input, 1024, stdin) != NULL)
+                printf("Invalid input. Please enter a valid phone number (exactly 9 digits): ");
+                if (fgets(input,  1024, stdin) != NULL)
                 {
-                    input[strcspn(input, "\n")] = '\0';
+                    // Check for buffer overflow protection
+                    if (strchr(input, '\n') == NULL) {
+                        // Input too long, clear the input buffer
+                        int c;
+                        while ((c = getchar()) != '\n' && c != EOF);
+                        printf("\033[0;31m");
+                        printf("<<(Input too long)!>> ");
+                        printf("\033[0m");
+                        continue;
+                    }
+                    input[strcspn(input, "\n")] = '\0';  
                 }
                 continue;
             }
             else
             {
                 break;
-                return;
             }
         }
     }

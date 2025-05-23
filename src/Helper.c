@@ -71,7 +71,7 @@ void transferownership(struct User *u)
     int Ex = Checkifexist(atoi(accountNb), u->name);
     if (Ex == 0)
     {
-        stayOrReturn(0, updateacount, u);
+        stayOrReturn(0,  transferownership, u);
     }
     printf("\nEnter the new owner name: ");
     fgets(newowner, sizeof(newowner), stdin);
