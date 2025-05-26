@@ -386,7 +386,7 @@ void validprompt(char *input, char *option)
         }
     }
     
-      if (strcmp(option, "P") == 0)
+    if (strcmp(option, "P") == 0)
     {
         while (1)
         {
@@ -443,6 +443,16 @@ void validprompt(char *input, char *option)
                 printf("Invalid input. Please enter a valid numbe of Amount $$$ : ");
                 if (fgets(input, 1024, stdin) != NULL)
                 {
+                    // Check for buffer overflow protection
+                    if (strchr(input, '\n') == NULL) {
+                        // Input too long, clear the input buffer
+                        int c;
+                        while ((c = getchar()) != '\n' && c != EOF);
+                        printf("\033[0;31m");
+                        printf("<<(Input too long)!>> ");
+                        printf("\033[0m");
+                        continue;
+                    }
                     input[strcspn(input, "\n")] = '\0';
                 }
                 continue;
@@ -450,7 +460,7 @@ void validprompt(char *input, char *option)
             else
             {
                 break;
-                return;
+              
             }
         }
     }
@@ -476,6 +486,16 @@ void validprompt(char *input, char *option)
                 printf("Invalid input. Please enter a valid type account : ");
                 if (fgets(input, 1024, stdin) != NULL)
                 {
+                    // Check for buffer overflow protection
+                    if (strchr(input, '\n') == NULL) {
+                        // Input too long, clear the input buffer
+                        int c;
+                        while ((c = getchar()) != '\n' && c != EOF);
+                        printf("\033[0;31m");
+                        printf("<<(Input too long)!>> ");
+                        printf("\033[0m");
+                        continue;
+                    }
                     input[strcspn(input, "\n")] = '\0';
                 }
                 continue;

@@ -282,6 +282,7 @@ noAccount:
         printf("\033[1;31m");
         printf("Input too long, (Error at Country name) << Please respect the limit of 50 characters or u will return to the starting point >> !!");
         printf("\033[0m");
+        system("clear");
         goto noAccount;
     }
     // Remove newline character
@@ -326,6 +327,7 @@ noAccount:
         printf("\033[1;31m");
         printf("Input too long ,(Error at Amount phase) << please respect the limit of 9 digits or u will return to the starting point >> !!");
         printf("\033[0m");
+        system("clear");
         goto noAccount;
     }
 
@@ -349,6 +351,7 @@ noAccount:
         printf("\033[1;31m");
         printf("Input too long, (Error at Type of account) << Please respect the limit 7 characters or u will return to the starting point >> !!");
         printf("\033[0m");
+        system("clear");
         goto noAccount;
     }
     

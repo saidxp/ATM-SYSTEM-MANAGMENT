@@ -44,7 +44,10 @@ void loginMenu(struct User *u)
         Tname[strcspn(Tname, "\n")] = '\0';
         if (strlen(Tname) == 0 || ISNAME(Tname))
         {
-            printf("\n\n\t\t\t\tPlease enter a valid name Mybe empty or invalid characters");
+            printf("\033[43m");
+
+            printf("\n\n\t\t\t\t ⚠️ Please enter a valid name u are entre empty or invalid characters");
+            printf("\033[0m");
             n = false;
             c += 1;
             continue;
