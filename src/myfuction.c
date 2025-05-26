@@ -5,7 +5,6 @@
 #include <ctype.h>
 // const char *RECORDS = "../data/records.txt";
 
- 
 bool signUp(struct User *u)
 {
     struct termios oflags, nflags;
@@ -135,11 +134,10 @@ bool signUp(struct User *u)
     {
         // Use safer strncpy instead of strcpy to prevent buffer overflow
         strncpy(u->name, us.name, sizeof(u->name) - 1);
-        u->name[sizeof(u->name) - 1] = '\0'; // Ensure null termination
+        u->name[sizeof(u->name) - 1] = '\0';
 
         strncpy(u->password, us.password, sizeof(u->password) - 1);
-        u->password[sizeof(u->password) - 1] = '\0'; // Ensure null termination
-
+        u->password[sizeof(u->password) - 1] = '\0';
         saveusersToFile(pf, u);
         fclose(pf);
 
@@ -192,8 +190,7 @@ int getUserId(const char *username)
     fclose(f);
     return -1;
 }
- 
- 
+
 int ISNAME(char *s)
 {
 
@@ -245,13 +242,29 @@ void CheCkday(char *date, struct Record *r)
     int valid = 0;
     // The month of year !!
     int daysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
     while (!valid)
     {
-
         if (!isValidFormat(date))
         {
             printf("Invalid date format. Please use mm/dd/yyyy: ");
-            fgets(date, 1024, stdin);
+            if (fgets(date, 1024, stdin) == NULL)
+            {
+                printf("Error reading input. Please try again.\n");
+                continue;
+            }
+            // check for overflow
+            if (strchr(date, '\n') == NULL)
+            {
+                printf("\033[0;31m");
+                printf("(Input too long)");
+                printf("\033[0m");
+                // Clear the input buffer
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                continue;
+            }
             date[strcspn(date, "\n")] = '\0';
             continue;
         }
@@ -259,7 +272,22 @@ void CheCkday(char *date, struct Record *r)
         if (sscanf(date, "%d/%d/%d", &month, &day, &year) != 3)
         {
             printf("Invalid date. Please enter again (mm/dd/yyyy): ");
-            fgets(date, 1024, stdin);
+            if (fgets(date, 1024, stdin) == NULL)
+            {
+                printf("Error reading input. Please try again.\n");
+                continue;
+            }
+            // Check for overflow
+            if (strchr(date, '\n') == NULL)
+            {
+                printf("\033[0;31m");
+                printf("(Input too long)");
+                printf("\033[0m");
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                continue;
+            }
             date[strcspn(date, "\n")] = '\0';
             continue;
         }
@@ -267,25 +295,60 @@ void CheCkday(char *date, struct Record *r)
         if (month < 1 || month > 12)
         {
             printf("Month must be between 1 and 12. Please enter again (mm/dd/yyyy): ");
-            fgets(date, 1024, stdin);
+            if (fgets(date, 1024, stdin) == NULL)
+            {
+                printf("Error reading input. Please try again.\n");
+                continue;
+            }
+            // Check for overflow !!!
+            if (strchr(date, '\n') == NULL)
+            {
+
+                printf("\033[0;31m");
+                printf("(Input too long)");
+                printf("\033[0m");
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                continue;
+            }
             date[strcspn(date, "\n")] = '\0';
             continue;
         }
 
+        // Check for sana kabisa
         if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
         {
             daysInMonth[2] = 29;
         }
+
         if (day < 1 || day > daysInMonth[month])
         {
             printf("Invalid day for the given month. Please enter again (mm/dd/yyyy): ");
-            fgets(date, 1024, stdin);
+            if (fgets(date, 1024, stdin) == NULL)
+            {
+                printf("Error reading input. Please try again.\n");
+                continue;
+            }
+            // Check for overflow !!!
+            if (strchr(date, '\n') == NULL)
+            {
+                printf("\033[0;31m");
+                printf("(Input too long)");
+                printf("\033[0m");
+                // Clear the input buffer
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                continue;
+            }
             date[strcspn(date, "\n")] = '\0';
             continue;
         }
 
         valid = 1;
     }
+
     if (valid == 1)
     {
         r->deposit.month = month;
@@ -297,7 +360,7 @@ void CheCkday(char *date, struct Record *r)
 void validprompt(char *input, char *option)
 {
     int len;
-     if (strcmp(option, "N") == 0)
+    if (strcmp(option, "N") == 0)
     {
         while (1)
         {
@@ -310,18 +373,19 @@ void validprompt(char *input, char *option)
                 if (fgets(input, 1024, stdin) != NULL)
                 {
                     // check for buffer overflow protection
-                    if (strchr(input, '\n') == NULL) {
+                    if (strchr(input, '\n') == NULL)
+                    {
                         // input too long, clear the input buffer
                         int c;
-                        while ((c = getchar()) != '\n' && c != EOF);
+                        while ((c = getchar()) != '\n' && c != EOF)
+                            ;
                         printf("\033[0;31m");
                         printf("<<(Input too long)!>> ");
                         printf("\033[0m");
                         continue;
                     }
-                    
+
                     input[strcspn(input, "\n")] = '\0';
-                    
                 }
                 continue;
             }
@@ -332,7 +396,7 @@ void validprompt(char *input, char *option)
             }
         }
     }
-     
+
     if (strcmp(option, "C") == 0)
     {
         while (1)
@@ -342,12 +406,13 @@ void validprompt(char *input, char *option)
             struct Country c;
 
             FILE *pf = fopen("../data/country.txt", "r");
-            if (pf == NULL) {
+            if (pf == NULL)
+            {
                 printf("Error opening country file.\n");
                 break;
             }
-            
-            while (fgets(c.country,  50, pf) != NULL) // Limited buffer as you had
+
+            while (fgets(c.country, 50, pf) != NULL) // Limited buffer as you had
             {
                 c.country[strcspn(c.country, "\n")] = '\0';
                 if (strcmp(c.country, input) == 0)
@@ -363,19 +428,20 @@ void validprompt(char *input, char *option)
                 if (fgets(input, 1024, stdin) != NULL)
                 {
                     // Check for buffer overflow protection
-                    if (strchr(input, '\n') == NULL) {
-                          //printf("input : %s\n", input);
+                    if (strchr(input, '\n') == NULL)
+                    {
+                        // printf("input : %s\n", input);
                         // Input too long, clear the input buffer
                         int c;
-                        while ((c = getchar()) != '\n' && c != EOF);
+                        while ((c = getchar()) != '\n' && c != EOF)
+                            ;
                         printf("\033[0;31m");
                         printf("<<(Input too long)!>> ");
                         printf("\033[0m");
                         continue;
                     }
                     input[strcspn(input, "\n")] = '\0';
-                    //printf("input : %s\n", input);
-                    
+                    // printf("input : %s\n", input);
                 }
                 continue;
             }
@@ -385,7 +451,7 @@ void validprompt(char *input, char *option)
             }
         }
     }
-    
+
     if (strcmp(option, "P") == 0)
     {
         while (1)
@@ -393,7 +459,7 @@ void validprompt(char *input, char *option)
             int i = 0;
             len = strlen(input);
             char *Temp = input;
-            
+
             while (*Temp)
             {
                 if (isalpha(*Temp))
@@ -403,23 +469,25 @@ void validprompt(char *input, char *option)
                 }
                 Temp++;
             }
-            
+
             if (i == 1 || len == 0 || len != 9) // Fixed: should be exactly 9, not range check
             {
                 printf("Invalid input. Please enter a valid phone number (exactly 9 digits): ");
-                if (fgets(input,  1024, stdin) != NULL)
+                if (fgets(input, 1024, stdin) != NULL)
                 {
                     // Check for buffer overflow protection
-                    if (strchr(input, '\n') == NULL) {
+                    if (strchr(input, '\n') == NULL)
+                    {
                         // Input too long, clear the input buffer
                         int c;
-                        while ((c = getchar()) != '\n' && c != EOF);
+                        while ((c = getchar()) != '\n' && c != EOF)
+                            ;
                         printf("\033[0;31m");
                         printf("<<(Input too long)!>> ");
                         printf("\033[0m");
                         continue;
                     }
-                    input[strcspn(input, "\n")] = '\0';  
+                    input[strcspn(input, "\n")] = '\0';
                 }
                 continue;
             }
@@ -444,10 +512,12 @@ void validprompt(char *input, char *option)
                 if (fgets(input, 1024, stdin) != NULL)
                 {
                     // Check for buffer overflow protection
-                    if (strchr(input, '\n') == NULL) {
+                    if (strchr(input, '\n') == NULL)
+                    {
                         // Input too long, clear the input buffer
                         int c;
-                        while ((c = getchar()) != '\n' && c != EOF);
+                        while ((c = getchar()) != '\n' && c != EOF)
+                            ;
                         printf("\033[0;31m");
                         printf("<<(Input too long)!>> ");
                         printf("\033[0m");
@@ -460,7 +530,6 @@ void validprompt(char *input, char *option)
             else
             {
                 break;
-              
             }
         }
     }
@@ -487,10 +556,12 @@ void validprompt(char *input, char *option)
                 if (fgets(input, 1024, stdin) != NULL)
                 {
                     // Check for buffer overflow protection
-                    if (strchr(input, '\n') == NULL) {
+                    if (strchr(input, '\n') == NULL)
+                    {
                         // Input too long, clear the input buffer
                         int c;
-                        while ((c = getchar()) != '\n' && c != EOF);
+                        while ((c = getchar()) != '\n' && c != EOF)
+                            ;
                         printf("\033[0;31m");
                         printf("<<(Input too long)!>> ");
                         printf("\033[0m");
@@ -520,4 +591,3 @@ int isPrintableString(const char *str)
     }
     return 1;
 }
- 

@@ -158,13 +158,15 @@ void transferownership(struct User *u)
 
 int isValidFormat(const char *date) {
    
-    if (strlen(date) != 10) return 0;
-
+    if (strlen(date) != 10) 
+    return 0;
     for (int i = 0; i < 10; i++) {
         if (i == 2 || i == 5) {
-            if (date[i] != '/') return 0;
+            if (date[i] != '/') 
+            return 0;
         } else {
-            if (!isdigit(date[i])) return 0;
+            if (!isdigit(date[i])) 
+            return 0;
         }
     }
     return 1;
