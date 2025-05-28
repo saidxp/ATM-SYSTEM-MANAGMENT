@@ -187,8 +187,8 @@ void createNewAcc(struct User *u)
         return;
     }
 
-    system("clear");
-
+     printf("\033[2J\033[H");
+        fflush(stdout);
 noAccount:
   
     printf("\n\n\t\t\t======= ATM =======\n");
@@ -205,10 +205,11 @@ noAccount:
     if (strchr(day, '\n') == NULL) {
         // Input was too long, clear the remaining buffer
         clearInputBuffer();
-        system("clear");
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
         printf("\033[0;31m");
         printf("Input too long. Please try again with a shorter date, respect the format mm/dd/yyyy !!\n");
-        printf("\033[0m"); 
+        printf("\033[0m");
         goto noAccount;
     }
     // Remove newline character
@@ -227,7 +228,8 @@ noAccount:
     // Check for overflow
     if (strchr(Tnumber, '\n') == NULL) {
         clearInputBuffer();
-        system("clear");
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
         printf("\033[1;31m");
         printf("Input too long, (Eroor at Number of Acount) << ! Please respect the limit of 6 digits or u will return to the starting point !!! >>");
         printf("\033[0m");
@@ -278,11 +280,11 @@ noAccount:
     // Check for overflow
     if (strchr(country, '\n') == NULL) {
         clearInputBuffer();
-        system("clear");
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
         printf("\033[1;31m");
         printf("Input too long, (Error at Country name) << Please respect the limit of 50 characters or u will return to the starting point >> !!");
         printf("\033[0m");
-        system("clear");
         goto noAccount;
     }
     // Remove newline character
@@ -300,11 +302,11 @@ noAccount:
     // Check for overflow
     if (strchr(phone, '\n') == NULL) {
         clearInputBuffer();
-        system("clear");
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
         printf("\033[1;31m");
         printf("Input too long, (Error at Phone number) << Please respect the limit of 9 digits or u will return to the starting point >> !!");
         printf("\033[0m");
-        system("clear");
         goto noAccount;
     }
     // remove newline character
@@ -323,11 +325,11 @@ noAccount:
     // check for overflow
     if (strchr(Amount, '\n') == NULL) {
         clearInputBuffer();
-        system("clear");
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
         printf("\033[1;31m");
         printf("Input too long ,(Error at Amount phase) << please respect the limit of 9 digits or u will return to the starting point >> !!");
         printf("\033[0m");
-        system("clear");
         goto noAccount;
     }
 
@@ -347,11 +349,11 @@ noAccount:
     // Check for overflow
     if (strchr(Type, '\n') == NULL) {
         clearInputBuffer();
-        system("clear");
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
         printf("\033[1;31m");
         printf("Input too long, (Error at Type of account) << Please respect the limit 7 characters or u will return to the starting point >> !!");
         printf("\033[0m");
-        system("clear");
         goto noAccount;
     }
     
