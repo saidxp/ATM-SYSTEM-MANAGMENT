@@ -187,181 +187,194 @@ void createNewAcc(struct User *u)
         return;
     }
 
-     printf("\033[2J\033[H");
-        fflush(stdout);
-noAccount:
-  
-    printf("\n\n\t\t\t======= ATM =======\n");
-    printf("\t\t\t===== New record =====\n");
+    printf("\033[3J\033[2J\033[H");
+    fflush(stdout);
 
-    // Get date with buffer overflow protection
-    printf("\nEnter today's date(mm/dd/yyyy): ");
-    if (fgets(day, sizeof(day), stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        goto noAccount;
-    }
-    
-    // Check for overflow using strchr to find newline character
-    if (strchr(day, '\n') == NULL) {
-        // Input was too long, clear the remaining buffer
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[0;31m");
-        printf("Input too long. Please try again with a shorter date, respect the format mm/dd/yyyy !!\n");
-        printf("\033[0m");
-        goto noAccount;
-    }
-    // Remove newline character
-    day[strcspn(day, "\n")] = '\0';
-    /// CHECK THE DATE FORMAT !!! 
-    CheCkday(day, &r);
-    printf("The date is: %s\n", day);
-    
-    // Get account number with buffer overflow protection
-    printf("\nEnter number of Account: ");
-    if (fgets(Tnumber, sizeof(Tnumber), stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        goto noAccount;
-    }
-    
-    // Check for overflow
-    if (strchr(Tnumber, '\n') == NULL) {
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[1;31m");
-        printf("Input too long, (Eroor at Number of Acount) << ! Please respect the limit of 6 digits or u will return to the starting point !!! >>");
-        printf("\033[0m");
-        goto noAccount;
-         
-    }
-    
-    // Remove newline character
-    Tnumber[strcspn(Tnumber, "\n")] = '\0';
-    
-    // CHECK THE NUMBER OF ACCOUNT
-    validprompt(Tnumber, "N");
-    r.accountNbr = atoi(Tnumber);
-    
-    int count = 0;
-    fseek(pf, 0, SEEK_SET);
-    while (getAccountFromFile(pf, &cr))
-    {
-        if (strcmp(cr.name, u->name) == 0 && cr.accountNbr == r.accountNbr)
-        {
-            system("clear");
-            printf("\033[2;31m");
-            printf("✖ This Account already exists for this user\n\n");
-            printf("<<Please try again with another number !!>\n\n");
-            printf("\033[0m");
-            goto noAccount;
+    while(1) {
+        printf("\n\n\t\t\t======= ATM =======\n");
+        printf("\t\t\t===== New record =====\n");
+
+        // Get date with buffer overflow protection
+        printf("\nEnter today's date(mm/dd/yyyy): ");
+        if (fgets(day, sizeof(day), stdin) == NULL) {
+            printf("Error reading input. Please try again.\n");
+            continue;
         }
-        count++;
-    }
+        
+        // Check for overflow using strchr to find newline character
+        if (strchr(day, '\n') == NULL) {
+            // Input was too long, clear the remaining buffer
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[0;31m");
+            printf("Input too long. Please try again with a shorter date, respect the format mm/dd/yyyy !!\n");
+            printf("\033[0m"); 
+            continue;
+        }
+        // Remove newline character
+        day[strcspn(day, "\n")] = '\0';
+        /// CHECK THE DATE FORMAT !!! 
+        CheCkday(day, &r);
+        printf("The date is: %s\n", day);
+        
+        // Get account number with buffer overflow protection
+        printf("\nEnter number of Account: ");
+        if (fgets(Tnumber, sizeof(Tnumber), stdin) == NULL) {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+        
+        // Check for overflow
+        if (strchr(Tnumber, '\n') == NULL) {
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[1;31m");
+            printf("Input too long, (Eroor at Number of Acount) << ! Please respect the limit of 6 digits or u will return to the starting point !!! >>");
+            printf("\033[0m");
+            continue;
+        }
+        
+        // Remove newline character
+        Tnumber[strcspn(Tnumber, "\n")] = '\0';
+        
+        // CHECK THE NUMBER OF ACCOUNT
+        validprompt(Tnumber, "N");
+        r.accountNbr = atoi(Tnumber);
+        
+        int count = 0;
+        fseek(pf, 0, SEEK_SET);
+        int accountExists = 0;
+        while (getAccountFromFile(pf, &cr))
+        {
+            if (strcmp(cr.name, u->name) == 0 && cr.accountNbr == r.accountNbr)
+            {
+                printf("\033[3J\033[2J\033[H");
+                fflush(stdout);
+                
+                printf("\033[1;31m");
+                printf("✖ This Account already exists for this user\n\n");
+                printf("<<Please try again with another number !!>\n\n");
+                printf("\033[0m");
+                accountExists = 1;
+                break;
+            }
+            count++;
+        }
+         
+        if (accountExists) {
+            continue;
+        }
+        
+        /// Set ID based on count
+        if (count == 0)
+        {
+            r.id = 0;
+        }
+        else
+        {
+            r.id = cr.id + 1;
+        }
 
-    /// Set ID based on count
-    if (count == 0)
-    {
-        r.id = 0;
-    }
-    else
-    {
-        r.id = cr.id + 1;
-    }
+        // Get country with buffer overflow protection
+        printf("\nEnter the country: ");
+        if (fgets(country, sizeof(country), stdin) == NULL) {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+        
+        // Check for overflow
+        if (strchr(country, '\n') == NULL) {
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[1;31m");
+            printf("Input too long, (Error at Country name) << Please respect the limit of 50 characters or u will return to the starting point >> !!");
+            printf("\033[0m");
+            continue;
+        }
+        // Remove newline character
+        country[strcspn(country, "\n")] = '\0';
+        
+        validprompt(country, "C");
+        strcpy(r.country, country);
+        
+        // Get phone with buffer overflow protection
+        printf("\nEnter the phone number: ");
+        if (fgets(phone, sizeof(phone), stdin) == NULL) {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+        // Check for overflow
+        if (strchr(phone, '\n') == NULL) {
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[1;31m");
+            printf("Input too long, (Error at Phone number) << Please respect the limit of 9 digits or u will return to the starting point >> !!");
+            printf("\033[0m");
+            continue;
+        }
+        // remove newline character
+        phone[strcspn(phone, "\n")] = '\0';
+        
+        validprompt(phone, "P");
+        r.phone = atoi(phone);
 
-    // Get country with buffer overflow protection
-    printf("\nEnter the country: ");
-    if (fgets(country, sizeof(country), stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        goto noAccount;
-    }
-    
-    // Check for overflow
-    if (strchr(country, '\n') == NULL) {
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[1;31m");
-        printf("Input too long, (Error at Country name) << Please respect the limit of 50 characters or u will return to the starting point >> !!");
-        printf("\033[0m");
-        goto noAccount;
-    }
-    // Remove newline character
-    country[strcspn(country, "\n")] = '\0';
-    
-    validprompt(country, "C");
-    strcpy(r.country, country);
-    
-    // Get phone with buffer overflow protection
-    printf("\nEnter the phone number: ");
-    if (fgets(phone, sizeof(phone), stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        goto noAccount;
-    }
-    // Check for overflow
-    if (strchr(phone, '\n') == NULL) {
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[1;31m");
-        printf("Input too long, (Error at Phone number) << Please respect the limit of 9 digits or u will return to the starting point >> !!");
-        printf("\033[0m");
-        goto noAccount;
-    }
-    // remove newline character
-    phone[strcspn(phone, "\n")] = '\0';
-    
-    validprompt(phone, "P");
-    r.phone = atoi(phone);
+        // get amount to deposit with buffer overflow protection
+        printf("\nEnter amount to deposit $: ");
+        if (fgets(Amount, sizeof(Amount), stdin) == NULL) {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
 
-    // get amount to deposit with buffer overflow protection
-    printf("\nEnter amount to deposit $: ");
-    if (fgets(Amount, sizeof(Amount), stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        goto noAccount;
-    }
+        // check for overflow
+        if (strchr(Amount, '\n') == NULL) {
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[1;31m");
+            printf("Input too long ,(Error at Amount phase) << please respect the limit of 9 digits or u will return to the starting point >> !!");
+            printf("\033[0m");
+            continue;
+        }
 
-    // check for overflow
-    if (strchr(Amount, '\n') == NULL) {
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[1;31m");
-        printf("Input too long ,(Error at Amount phase) << please respect the limit of 9 digits or u will return to the starting point >> !!");
-        printf("\033[0m");
-        goto noAccount;
+        // remove newline character
+        Amount[strcspn(Amount, "\n")] = '\0';
+        // HER I DETETCT EROOOR !
+        
+        validprompt(Amount, "D");
+       
+        r.amount = strtod(Amount, NULL);
+        
+        // Get account type with buffer overflow protection
+        printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
+        if (fgets(Type, sizeof(Type), stdin) == NULL) {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+        
+        // Check for overflow
+        if (strchr(Type, '\n') == NULL) {
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[1;31m");
+            printf("Input too long, (Error at Type of account) << Please respect the limit 7 characters or u will return to the starting point >> !!");
+            printf("\033[0m");
+            continue;
+        }
+        
+        // Remove newline character
+        Type[strcspn(Type, "\n")] = '\0';
+        
+        validprompt(Type, "T");
+        strcpy(r.accountType, Type);
+        
+        // If we reach here, all input is valid - break out of loop
+        break;
     }
-
-    // remove newline character
-    Amount[strcspn(Amount, "\n")] = '\0';
-    // HER I DETETCT EROOOR !
-    validprompt(Amount, "D");
-    r.amount = strtod(Amount, NULL);
-    
-    // Get account type with buffer overflow protection
-    printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
-    if (fgets(Type, sizeof(Type), stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        goto noAccount;
-    }
-    
-    // Check for overflow
-    if (strchr(Type, '\n') == NULL) {
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[1;31m");
-        printf("Input too long, (Error at Type of account) << Please respect the limit 7 characters or u will return to the starting point >> !!");
-        printf("\033[0m");
-        goto noAccount;
-    }
-    
-    // Remove newline character
-    Type[strcspn(Type, "\n")] = '\0';
-    
-    validprompt(Type, "T");
-    strcpy(r.accountType, Type);
     
     saveAccountToFile(pf, u, &r);
     fclose(pf);

@@ -189,7 +189,7 @@ int Checkifexist(int nbr, char *name)
 
 bool checkvalidamount(char *str)
 {
-    printf("%s\n", str);
+     
     if (str[0] == '.')
     {
         return 0;

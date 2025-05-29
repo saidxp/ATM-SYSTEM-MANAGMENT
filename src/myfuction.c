@@ -291,7 +291,30 @@ void CheCkday(char *date, struct Record *r)
             date[strcspn(date, "\n")] = '\0';
             continue;
         }
-
+        // check year !
+        if (year < 2025 || year > 2999)
+        {
+            printf("Year must be between 2025 and 2999. Please enter again (mm/dd/yyyy): ");
+            if (fgets(date, 1024, stdin) == NULL)
+            {
+                printf("Error reading input. Please try again.\n");
+                continue;
+            }
+            // Check for overflow
+            if (strchr(date, '\n') == NULL)
+            {
+                printf("\033[0;31m");
+                printf("(Input too long)");
+                printf("\033[0m");
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                continue;
+            }
+            date[strcspn(date, "\n")] = '\0';
+            continue;
+        }
+        // check month !
         if (month < 1 || month > 12)
         {
             printf("Month must be between 1 and 12. Please enter again (mm/dd/yyyy): ");
@@ -462,7 +485,7 @@ void validprompt(char *input, char *option)
 
             while (*Temp)
             {
-                if (isalpha(*Temp))
+                if (!isdigit(*Temp))
                 {
                     i = 1;
                     break;

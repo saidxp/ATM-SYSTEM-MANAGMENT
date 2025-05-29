@@ -21,15 +21,37 @@ void checkAcount(struct User *u)
         {
             system("clear");
             printf("\n\n\t\t\t======= Not Found This Account =======\n");
+            found = 0;
         }
+         
         printf("\n\n\t\t\t======= ATM =======\n");
         printf("\t\t\t===== Check Account =====\n");
         printf("\n\n\t\t\t\"Entre -1 At first Paramter if u want skipp and return to Menu !!\"");
-        printf("\n\n\n\t\t\tMr. %s Please Chose In Wich Compte u Want: ", u->name);
-        // I GET a PROBLEM TO NOT READ FROM STDIN AND I USE GETCHAR TO CLEAR THE BUFFER
+        
+       
+            printf("\n\n\n\t\t\tMr. %s Please Chose In Wich Compte u Want: ", u->name);
+            // I GET a PROBLEM TO NOT READ FROM STDIN AND I USE GETCHAR TO CLEAR THE BUFFER
 
-        fgets(Tname, 1024, stdin);
-        Tname[strcspn(Tname, "\n")] = '\0';
+            if (fgets(Tname, sizeof(Tname), stdin) != NULL)
+            {
+                // Check for buffer overflow
+                if (strchr(Tname, '\n') == NULL)
+                {
+                    printf("\033[3J\033[2J\033[H");
+                    fflush(stdout);
+                    printf("\033[0;31m");
+                    printf("Input too long, PLease put a valid number must be 6 number of less\n");
+                    printf("\033[0m");
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF)
+                        ;
+                    continue;
+                }
+
+                Tname[strcspn(Tname, "\n")] = '\0';
+                //detect = 1;
+            }
+        
         int skipp = atoi(Tname);
         if (skipp == -1)
         {
@@ -40,12 +62,25 @@ void checkAcount(struct User *u)
             len = strlen(Tname);
             if (!ISNAME(Tname) || len == 0 || len > 9)
             {
-                printf("U are put limit or empty please try again with valid character : ");
+                printf("U are put invalid or empty please try again with valid character : ");
                 if (fgets(Tname, 1024, stdin) != NULL)
                 {
-                    Tname[strcspn(Tname, "\n")] = '\0';
+                
+                if (strchr(Tname, '\n') == NULL)
+                {
+                    printf("\033[0;31m");
+                    printf("Input too long, PLease put a valid number must be 6 number of less\n");
+                    printf("\033[0m");
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF)
+                        ;
+                    continue;
                 }
+
+                Tname[strcspn(Tname, "\n")] = '\0';
+                //detect = 1;
                 continue;
+            }
             }
             else
             {
@@ -98,7 +133,6 @@ void checkAcount(struct User *u)
     stayOrReturn(i, checkAcount, u);
 }
 
-
 void updateacount(struct User *u)
 {
     struct Record r;
@@ -110,12 +144,34 @@ void updateacount(struct User *u)
     char op[1024];
     int clear = 0;
     system("clear");
-    printf("\n\n\t\t   ======= ATM =======\n");
-    printf("\n\t\t\"Entre -1 At first Parameter if u want skipp and return to Menu !!\"");
-    printf("\n\n\t\t   ======= %s =======\n", u->name);
-    printf("\n\n\t\t=======  Update account =======\n");
-    printf("\n\t\tEnter the account number: ");
-    fgets(accountNbr, sizeof(accountNbr), stdin);
+    while (1)
+    {
+        printf("\n\n\t\t   ======= ATM =======\n");
+        printf("\n\t\t\"Entre -1 At first Parameter if u want skipp and return to Menu !!\"");
+        printf("\n\n\t\t   ======= %s =======\n", u->name);
+        printf("\n\n\t\t=======  Update account =======\n");
+
+        printf("\n\t\tEnter the account number: ");
+        if (fgets(accountNbr, sizeof(accountNbr), stdin) == NULL)
+        {
+            printf("Error reading input. Please try again.\n");
+            continue;
+        }
+
+        // Check for overflow using strchr !...
+        if (strchr(accountNbr, '\n') == NULL)
+        {
+            // Input was too long !!
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[0;31m");
+            printf("\nInput too long. Please try again with a valid account Number !");
+            printf("\033[0m");
+            continue;
+        }
+        break;
+    }
     accountNbr[strcspn(accountNbr, "\n")] = '\0';
     int skipp = atoi(accountNbr);
     if (skipp == -1)
@@ -133,8 +189,27 @@ void updateacount(struct User *u)
     printf("\n\t\t[1]- Country\n");
     printf("\n\t\t[2]- Phone\n");
     printf("\nEnter your choice: ");
-    fgets(option, sizeof(option), stdin);
-    option[strcspn(option, "\n")] = '\0';
+    // Read initial input
+    if (fgets(option, sizeof(option), stdin) != NULL)
+    {
+        // Check for buffer overflow on initial input
+        if (strlen(option) == sizeof(option) - 1 && option[sizeof(option) - 2] != '\n')
+        {
+            // Buffer overflow detected - clear remaining input
+            printf("\033[0;31m");
+            printf("Input too long! Buffer overflow detected.\n");
+            printf("\033[0m");
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF)
+                ;
+            strcpy(option, "");
+        }
+        else
+        {
+            option[strcspn(option, "\n")] = '\0';
+        }
+    }
+
     int tt;
 
     while (1)
@@ -147,6 +222,17 @@ void updateacount(struct User *u)
             printf("Try again, input must be 1 or 2: ");
             if (fgets(option, sizeof(option), stdin) != NULL)
             {
+                // Check for buffer overflow
+                if (strlen(option) == sizeof(option) - 1 && option[sizeof(option) - 2] != '\n')
+                {
+                    // Buffer overflow detected - clear remaining input
+                    printf("Input too long! Buffer overflow detected.\n");
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF)
+                        ;
+                    continue; // Ask for input again
+                }
+
                 option[strcspn(option, "\n")] = '\0';
             }
             i = strlen(option);
@@ -167,20 +253,56 @@ void updateacount(struct User *u)
             switch (tt)
             {
             case 1:
-                printf("Enter new country: ");
-                fgets(country, sizeof(country), stdin);
-                country[strcspn(country, "\n")] = '\0';
+                while (1)
+                {
+                    printf("Enter new country: ");
+                    if (fgets(country, sizeof(country), stdin) != NULL)
+                    {
+                        // Check for buffer overflow
+                        if (strchr(country, '\n') == NULL)
+                        {
+                            printf("\033[0;31m");
+
+                            printf("Country name too long! Please enter a shorter name.\n");
+                            printf("\033[0m");
+                            int c;
+                            while ((c = getchar()) != '\n' && c != EOF)
+                                ;
+                            continue;
+                        }
+
+                        country[strcspn(country, "\n")] = '\0';
+                        break;
+                    }
+                }
+
                 validprompt(country, "C");
                 int len = strlen(country);
                 // Then copy the new data including the null terminator
                 strcpy(r.country, country);
                 break;
             case 2:
-                printf("Enter new phone number: ");
-                getchar();
-                if (fgets(phone, sizeof(phone), stdin) != NULL)
+                while (1)
                 {
-                    phone[strcspn(phone, "\n")] = '\0';
+                    printf("Enter new phone number: ");
+                    if (fgets(phone, sizeof(phone), stdin) != NULL)
+                    {
+                        // Check for buffer overflow
+                        if (strchr(phone, '\n') == NULL)
+                        {
+                            printf("\033[0;31m");
+
+                            printf("Phone name too long! Please enter a shorter name.\n");
+                            printf("\033[0m");
+                            int c;
+                            while ((c = getchar()) != '\n' && c != EOF)
+                                ;
+                            continue;
+                        }
+
+                        phone[strcspn(phone, "\n")] = '\0';
+                        break;
+                    }
                 }
                 validprompt(phone, "P");
                 r.phone = atoi(phone);
@@ -279,7 +401,6 @@ void removeacount(struct User *u)
     stayOrReturn(found, removeacount, u);
 }
 
-
 void transaction(struct User *u)
 {
     char accnbr[1024];
@@ -288,12 +409,31 @@ void transaction(struct User *u)
     int found = 0;
     char take[1024];
     char add[1024];
+
     system("clear");
+    int stop = 0;
+    while (!stop)
+    {
+     
+    
     printf("\n\n\t\t   ======= ATM =======\n");
     printf("\n\n\t\t======= Make Transaction .=======\n");
     printf("\n\n\t\t======= Mr. %s .=======\n", u->name);
     printf("\n\t\tEnter the account number: ");
-    fgets(accnbr, 1024, stdin);
+    if (fgets(accnbr, 1024, stdin) == NULL) {
+        printf("Error reading input. Please try again.\n");
+        continue;
+    }
+
+    if (strchr(accnbr, '\n') == NULL) {
+        clearInputBuffer();
+        printf("\033[3J\033[2J\033[H");
+        fflush(stdout);
+        printf("\033[0;31m");
+        printf("Input too long. Please try again with a valid account Number !");
+        printf("\033[0m");
+        continue;
+    }
     accnbr[strcspn(accnbr, "\n")] = '\0';
     validprompt(accnbr, "N");
     int nbr = atoi(accnbr);
@@ -317,6 +457,7 @@ void transaction(struct User *u)
                 sleep(5);
                 found1 = true;
                 found = 0;
+                stop = 1;
                 break;
             }
             found = 1;
@@ -372,7 +513,7 @@ void transaction(struct User *u)
                     printf("\t<== After 5 seconde u will see message of not found and choose in option ==> ...!\n");
                     printf("\n\n\t\t\t\t\t\t Thank you Mr. %s !!\n", u->name);
                     found = 0;
-
+                    stop = 1;
                     sleep(5);
                 }
                 else
@@ -403,9 +544,12 @@ void transaction(struct User *u)
                 r.amount,
                 r.accountType);
     }
-
     fclose(pf);
     fclose(temp);
+    stop = 1;
+    }
+    
+
 
     if (found)
     {
