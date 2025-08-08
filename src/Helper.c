@@ -65,9 +65,31 @@ void transferownership(struct User *u)
     printf("\t\t\t===== Transfer ownership =====\n");
     printf("\t\t\t\t====  %s =====\n", u->name);
     printf("\nEnter the account number: ");
-    fgets(accountNb, sizeof(accountNb), stdin);
-    accountNb[strcspn(accountNb, "\n")] = '\0';
-    validprompt(accountNb, "N");
+    while (1)
+    {
+        if (fgets(accountNb, sizeof(accountNb), stdin) != NULL)
+        {
+            if (strchr(accountNb, '\n') == NULL)
+            {
+                printf("Input to long : Entre the acount number: ");
+                int c;
+                while ((c = getchar() != '\n') && c != EOF)
+                {
+                    ;    
+                }
+                
+                continue;
+            }
+            else
+            {
+                accountNb[strcspn(accountNb, "\n")] = '\0';
+                validprompt(accountNb, "N");
+                //Nbr = atoi(accountNbr);
+                break;
+            }
+        }
+    }
+    
     int Ex = Checkifexist(atoi(accountNb), u->name);
     if (Ex == 0)
     {

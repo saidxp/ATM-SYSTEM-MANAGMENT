@@ -106,9 +106,13 @@ void stayOrReturn(int notGood, void f(struct User *u), struct User *u)
             i++;
             if (fgets(Tname, 1024, stdin) != NULL)
             {
+                if (strchr(Tname, '\n') == NULL) {
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF);
+                    continue;
+                }
                 Tname[strcspn(Tname, "\n")] = '\0';
             }
-
             len = strlen(Tname);
             option = atoi(Tname);
             if (len == 1 && (option == 0 || option == 1))
@@ -144,7 +148,13 @@ void success(struct User *u)
     {
         if (fgets(Option, sizeof(Option), stdin) != NULL)
         {
-            Option[strcspn(Option, "\n")] = '\0';  
+            if (strchr(Option, '\n') == NULL) {
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF);
+                
+            }else {
+            Option[strcspn(Option, "\n")] = '\0';
+            }  
         }
 
         if (strlen(Option) == 1 && (Option[0] == '0' || Option[0] == '1'))
@@ -381,7 +391,7 @@ void createNewAcc(struct User *u)
     success(u);
 }
 
-// He
+// He 
 void clearInputBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);

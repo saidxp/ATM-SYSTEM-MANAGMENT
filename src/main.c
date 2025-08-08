@@ -9,6 +9,7 @@ void mainMenu(struct User *u)
     int option;
     char optionStr[100];
     char *result;
+    // i need to handle the 
     system("clear");
     printf("\n\n\t\t======= ATM =======\n\n");
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");

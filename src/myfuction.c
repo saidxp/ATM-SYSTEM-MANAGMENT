@@ -410,7 +410,7 @@ void validprompt(char *input, char *option)
 
                     input[strcspn(input, "\n")] = '\0';
                 }
-                continue;
+                //continue;
             }
             else
             {

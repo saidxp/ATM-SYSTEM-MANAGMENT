@@ -23,35 +23,34 @@ void checkAcount(struct User *u)
             printf("\n\n\t\t\t======= Not Found This Account =======\n");
             found = 0;
         }
-         
+
         printf("\n\n\t\t\t======= ATM =======\n");
         printf("\t\t\t===== Check Account =====\n");
         printf("\n\n\t\t\t\"Entre -1 At first Paramter if u want skipp and return to Menu !!\"");
-        
-       
-            printf("\n\n\n\t\t\tMr. %s Please Chose In Wich Compte u Want: ", u->name);
-            // I GET a PROBLEM TO NOT READ FROM STDIN AND I USE GETCHAR TO CLEAR THE BUFFER
 
-            if (fgets(Tname, sizeof(Tname), stdin) != NULL)
+        printf("\n\n\n\t\t\tMr. %s Please Chose In Wich Compte u Want: ", u->name);
+        // I GET a PROBLEM TO NOT READ FROM STDIN AND I USE GETCHAR TO CLEAR THE BUFFER
+
+        if (fgets(Tname, sizeof(Tname), stdin) != NULL)
+        {
+            // Check for buffer overflow
+            if (strchr(Tname, '\n') == NULL)
             {
-                // Check for buffer overflow
-                if (strchr(Tname, '\n') == NULL)
-                {
-                    printf("\033[3J\033[2J\033[H");
-                    fflush(stdout);
-                    printf("\033[0;31m");
-                    printf("Input too long, PLease put a valid number must be 6 number of less\n");
-                    printf("\033[0m");
-                    int c;
-                    while ((c = getchar()) != '\n' && c != EOF)
-                        ;
-                    continue;
-                }
-
-                Tname[strcspn(Tname, "\n")] = '\0';
-                //detect = 1;
+                printf("\033[3J\033[2J\033[H");
+                fflush(stdout);
+                printf("\033[0;31m");
+                printf("Input too long, PLease put a valid number must be 6 number of less\n");
+                printf("\033[0m");
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                continue;
             }
-        
+
+            Tname[strcspn(Tname, "\n")] = '\0';
+            // detect = 1;
+        }
+
         int skipp = atoi(Tname);
         if (skipp == -1)
         {
@@ -65,22 +64,22 @@ void checkAcount(struct User *u)
                 printf("U are put invalid or empty please try again with valid character : ");
                 if (fgets(Tname, 1024, stdin) != NULL)
                 {
-                
-                if (strchr(Tname, '\n') == NULL)
-                {
-                    printf("\033[0;31m");
-                    printf("Input too long, PLease put a valid number must be 6 number of less\n");
-                    printf("\033[0m");
-                    int c;
-                    while ((c = getchar()) != '\n' && c != EOF)
-                        ;
+
+                    if (strchr(Tname, '\n') == NULL)
+                    {
+                        printf("\033[0;31m");
+                        printf("Input too long, PLease put a valid number must be 6 number of less\n");
+                        printf("\033[0m");
+                        int c;
+                        while ((c = getchar()) != '\n' && c != EOF)
+                            ;
+                        continue;
+                    }
+
+                    Tname[strcspn(Tname, "\n")] = '\0';
+                    // detect = 1;
                     continue;
                 }
-
-                Tname[strcspn(Tname, "\n")] = '\0';
-                //detect = 1;
-                continue;
-            }
             }
             else
             {
@@ -358,11 +357,33 @@ void removeacount(struct User *u)
     system("clear");
     printf("\t\t\t===== Remove account =====\n");
     printf("\t\t\t===== Mr.%s =====\n", u->name);
-    printf("\nEnter the account number:");
-    fgets(accountNbr, sizeof(accountNbr), stdin);
-    accountNbr[strcspn(accountNbr, "\n")] = '\0';
-    validprompt(accountNbr, "N");
-    int Nbr = atoi(accountNbr);
+    printf("\nEnter the account number: ");
+    int Nbr;
+    while (1)
+    {
+        if (fgets(accountNbr, sizeof(accountNbr), stdin) != NULL)
+        {
+            if (strchr(accountNbr, '\n') == NULL)
+            {
+                printf("Input to long : Entre the acount number: ");
+                int c;
+                while ((c = getchar() != '\n') && c != EOF)
+                {
+                    ;    
+                }
+                   
+                continue;
+            }
+            else
+            {
+                accountNbr[strcspn(accountNbr, "\n")] = '\0';
+                validprompt(accountNbr, "N");
+                Nbr = atoi(accountNbr);
+                break;
+            }
+        }
+    }
+
     while (getAccountFromFile(pf, &r))
     {
         if (strcmp(r.name, u->name) == 0 && r.accountNbr == Nbr)
@@ -414,142 +435,169 @@ void transaction(struct User *u)
     int stop = 0;
     while (!stop)
     {
-     
-    
-    printf("\n\n\t\t   ======= ATM =======\n");
-    printf("\n\n\t\t======= Make Transaction .=======\n");
-    printf("\n\n\t\t======= Mr. %s .=======\n", u->name);
-    printf("\n\t\tEnter the account number: ");
-    if (fgets(accnbr, 1024, stdin) == NULL) {
-        printf("Error reading input. Please try again.\n");
-        continue;
-    }
 
-    if (strchr(accnbr, '\n') == NULL) {
-        clearInputBuffer();
-        printf("\033[3J\033[2J\033[H");
-        fflush(stdout);
-        printf("\033[0;31m");
-        printf("Input too long. Please try again with a valid account Number !");
-        printf("\033[0m");
-        continue;
-    }
-    accnbr[strcspn(accnbr, "\n")] = '\0';
-    validprompt(accnbr, "N");
-    int nbr = atoi(accnbr);
-    ///  - - - - - - -  > > > > !
-    FILE *pf = fopen("../data/records.txt", "r");
-    FILE *temp = fopen("../data/temp.txt", "w");
-    fseek(pf, 0, SEEK_SET);
-    bool found1 = false;
-
-    while (getAccountFromFile(pf, &r))
-    {
-        if (r.accountNbr == nbr && strcmp(r.name, u->name) == 0)
+        printf("\n\n\t\t   ======= ATM =======\n");
+        printf("\n\n\t\t======= Make Transaction .=======\n");
+        printf("\n\n\t\t======= Mr. %s .=======\n", u->name);
+        printf("\n\t\tEnter the account number: ");
+        if (fgets(accnbr, 1024, stdin) == NULL)
         {
-
-            if (strcmp(r.accountType, "fixed01") == 0 || strcmp(r.accountType, "fixed02") == 0 || strcmp(r.accountType, "fixed03") == 0)
-            {
-                system("clear");
-                printf("\n\n\t <===== YOU CAN'T DO THIS TRANSACTION ON THIS ACCOUNT =====>!\n\n");
-                printf("\t<== After 5 seconde u will see message of not found and choose in option ==> ...!\n");
-                printf("\n\n\t\t\t\t\t\t Thank you Mr. %s !!\n", u->name);
-                sleep(5);
-                found1 = true;
-                found = 0;
-                stop = 1;
-                break;
-            }
-            found = 1;
-            printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
-            printf("\n\t\t[1]- deposit\n");
-            printf("\n\t\t[2]- withdraw\n");
-            printf("Enter your choice: ");
-            fgets(option, sizeof(option), stdin);
-            option[strcspn(option, "\n")] = '\0';
-            int tt;
-            while (1)
-            {
-                int i = strlen(option);
-                tt = atoi(option);
-
-                if ((tt != 1 && tt != 2) || i > 1)
-                {
-                    printf("Try again, input must be 1 or 2: ");
-                    if (fgets(option, sizeof(option), stdin) != NULL)
-                    {
-                        option[strcspn(option, "\n")] = '\0';
-                    }
-                    i = strlen(option);
-                    continue;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            switch (tt)
-            {
-            case 1:
-                printf("Enter amount u want to add to account : ");
-                fgets(add, sizeof(add), stdin);
-                add[strcspn(add, "\n")] = '\0';
-                validprompt(add, "D");
-                // Then copy the new data including the null terminator
-                double a = strtod(add, NULL);
-                r.amount = a + r.amount;
-                printf("U add %lf $ to ur account successfully !\n", a);
-                break;
-            case 2:
-                printf("Entre amount u want to take from acount $$ :");
-                fgets(take, sizeof(take), stdin);
-                take[strcspn(take, "\n")] = '\0';
-                validprompt(take, "D");
-                double t = strtod(take, NULL);
-                if (t > r.amount)
-                {
-                    system("clear");
-                    printf("\n\n\t\t\t<<== YOU DON'T HAVE THIS AMOUNT in YOUR ACCOUNT ! << \n");
-                    printf("\t<== After 5 seconde u will see message of not found and choose in option ==> ...!\n");
-                    printf("\n\n\t\t\t\t\t\t Thank you Mr. %s !!\n", u->name);
-                    found = 0;
-                    stop = 1;
-                    sleep(5);
-                }
-                else
-                {
-                    r.amount = r.amount - t;
-                    printf("U take %lf $ from account successfully !\n", t);
-                }
-                break;
-            default:
-                printf("Invalid option.\n");
-                fclose(pf);
-                fclose(temp);
-                return;
-            }
+            printf("Error reading input. Please try again.\n");
+            continue;
         }
 
-        // her i write to the tempo file !!
-        fprintf(temp, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n",
-                r.id,
-                r.userId,
-                r.name,
-                r.accountNbr,
-                r.deposit.month,
-                r.deposit.day,
-                r.deposit.year,
-                r.country,
-                r.phone,
-                r.amount,
-                r.accountType);
-    }
-    fclose(pf);
-    fclose(temp);
-    stop = 1;
-    }
-    
+        if (strchr(accnbr, '\n') == NULL)
+        {
+            clearInputBuffer();
+            printf("\033[3J\033[2J\033[H");
+            fflush(stdout);
+            printf("\033[0;31m");
+            printf("Input too long. Please try again with a valid account Number !");
+            printf("\033[0m");
+            continue;
+        }
+        accnbr[strcspn(accnbr, "\n")] = '\0';
+        validprompt(accnbr, "N");
+        int nbr = atoi(accnbr);
+        ///  - - - - - - -  > > > > !
+        FILE *pf = fopen("../data/records.txt", "r");
+        FILE *temp = fopen("../data/temp.txt", "w");
+        fseek(pf, 0, SEEK_SET);
+        bool found1 = false;
 
+        while (getAccountFromFile(pf, &r))
+        {
+            if (r.accountNbr == nbr && strcmp(r.name, u->name) == 0)
+            {
+
+                if (strcmp(r.accountType, "fixed01") == 0 || strcmp(r.accountType, "fixed02") == 0 || strcmp(r.accountType, "fixed03") == 0)
+                {
+                    system("clear");
+                    printf("\n\n\t <===== YOU CAN'T DO THIS TRANSACTION ON THIS ACCOUNT =====>!\n\n");
+                    printf("\t<== After 5 seconde u will see message of not found and choose in option ==> ...!\n");
+                    printf("\n\n\t\t\t\t\t\t Thank you Mr. %s !!\n", u->name);
+                    sleep(5);
+                    found1 = true;
+                    found = 0;
+                    stop = 1;
+                    break;
+                }
+                found = 1;
+                printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
+                printf("\n\t\t[1]- deposit\n");
+                printf("\n\t\t[2]- withdraw\n");
+                printf("Enter your choice: ");
+                while (1)
+                {
+
+                    if (fgets(option, sizeof(option), stdin) != NULL)
+                    {
+                        if (strchr(option, '\n') == NULL)
+                        {
+
+                            printf("\"(input to long)\":Please choose 1 for deposit and 2 for withdraw: ");
+                            int c;
+                            while (c = getchar() != '\n' && c != EOF)
+                                ;
+                            continue;
+                        }
+                        else
+                        {
+                            option[strcspn(option, "\n")] = '\0';
+                            break;
+                        }
+                    }
+                }
+
+                int tt;
+                while (1)
+                {
+                    int i = strlen(option);
+                    tt = atoi(option);
+
+                    if ((tt != 1 && tt != 2) || i > 1)
+                    {
+                        printf("Try again, input must be 1 or 2: ");
+                        if (fgets(option, sizeof(option), stdin) != NULL)
+                        {
+                            // handle buffer overflow
+                            if (strchr(option, '\n') == NULL)
+                            {
+                                int c;
+                                while (c = getchar() != '\n' && c != EOF)
+                                    ;
+                                continue;
+                            }
+                            option[strcspn(option, "\n")] = '\0';
+                        }
+                        i = strlen(option);
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                switch (tt)
+                {
+                case 1:
+                    printf("Enter amount u want to add to account : ");
+                    fgets(add, sizeof(add), stdin);
+                    add[strcspn(add, "\n")] = '\0';
+                    validprompt(add, "D");
+                    // Then copy the new data including the null terminator
+                    double a = strtod(add, NULL);
+                    r.amount = a + r.amount;
+                    printf("U add %lf $ to ur account successfully !\n", a);
+                    break;
+                case 2:
+                    printf("Entre amount u want to take from acount $$ :");
+                    fgets(take, sizeof(take), stdin);
+                    take[strcspn(take, "\n")] = '\0';
+                    validprompt(take, "D");
+                    double t = strtod(take, NULL);
+                    if (t > r.amount)
+                    {
+                        system("clear");
+                        printf("\n\n\t\t\t<<== YOU DON'T HAVE THIS AMOUNT in YOUR ACCOUNT ! << \n");
+                        printf("\t<== After 5 seconde u will see message of not found and choose in option ==> ...!\n");
+                        printf("\n\n\t\t\t\t\t\t Thank you Mr. %s !!\n", u->name);
+                        found = 0;
+                        stop = 1;
+                        sleep(5);
+                    }
+                    else
+                    {
+                        r.amount = r.amount - t;
+                        printf("U take %lf $ from account successfully !\n", t);
+                    }
+                    break;
+                default:
+                    printf("Invalid option.\n");
+                    fclose(pf);
+                    fclose(temp);
+                    return;
+                }
+            }
+
+            // her i write to the tempo file !!
+            fprintf(temp, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n",
+                    r.id,
+                    r.userId,
+                    r.name,
+                    r.accountNbr,
+                    r.deposit.month,
+                    r.deposit.day,
+                    r.deposit.year,
+                    r.country,
+                    r.phone,
+                    r.amount,
+                    r.accountType);
+        }
+        fclose(pf);
+        fclose(temp);
+        stop = 1;
+    }
 
     if (found)
     {
